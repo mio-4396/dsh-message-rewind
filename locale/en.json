@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "Withdraw a message",
+    "description": "Withdraw one of your own messages into a new branch and put its text back in the composer for editing."
+  }
+}
