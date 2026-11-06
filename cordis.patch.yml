@@ -1,0 +1,10 @@
+# dsh-message-rewind — insert the Host row.
+#
+# The feature itself runs in the browser: the Client half declared by
+# `dsh.client` in package.json registers into two slots
+# (`conversation.chat.user.before` for the per-message chip and
+# `shell.overlay` for its notices). This row only exists so the package has a
+# Loader entry, a Plugin Manager page and a place for future configuration.
+- insert:
+    - id: dsh-message-rewind
+      name: 'dsh-message-rewind'
