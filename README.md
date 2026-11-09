@@ -19,13 +19,22 @@ This is a standard DSH bundle: the `dsh.bundle.patch` in `package.json` inserts 
 dsh plugin install <path-to-this-directory>
 ```
 
-Then reload the DSH page once. Host-side changes (`index.js`) need a DSH restart, or toggling the plugin off and on in the Plugins page.
+Then reload the DSH page once. Host-side changes (`src/index.js` → `lib/index.js`) need a DSH restart, or toggling the plugin off and on in the Plugins page.
+
+## Develop / 开发
+
+```powershell
+npm run build   # copy src/ -> lib/, then check manifest, patch, locales, icon, syntax
+npm test        # build + the manifest/output suite
+```
+
+`lib/` is generated and committed: DSH loads `lib/index.js` and `lib/client.js`, so a change is not live until `npm run build` has run.
 
 ## How it works / 实现
 
 | Step | Entry point |
 | --- | --- |
-| 操作条里的入口 | `conversation.chat.user.before` chain slot; the button is measured against the shipped copy action, so same square, colour, hover fill, one gap to its left |
+| 操作条里的入口 | `conversation.chat.user.before` chain slot. The button's square, colour and hover bubble follow the shipped copy action; its position is CSS-anchored one copy-width plus one gap from the row's right edge, and only the vertical offset is measured |
 | 读原文 | the Chat node is read off the React fiber above the bubble (`data.content`) |
 | 停止本轮 | `POST /.dsh-message-rewind/cancel` → Host `sessionController.cancel({ sessionId })` |
 | 原文放回 | `ctx.conversation.input.requestDraftInitialization(binding, { prompt, whenDraftExists: 'replace' })`, with `setDraft` and then clipboard as fallbacks |
@@ -47,12 +56,18 @@ DSH keeps an append-only session log, and the chat transcript is built **only fr
 ## Layout
 
 ```
-package.json       bundle manifest: patch row + dsh.client entry
-cordis.patch.yml   inserts the Host row
-index.js           Host half: the cancel route
-client.js          browser half: the action, the row mark, the notices
-locale/{en,zh}.json Plugin Manager title and description
-icon.svg           plugin icon
+package.json            bundle manifest: patch row + dsh.client entry
+cordis.patch.yml        inserts the Host row
+src/index.js            Host half: the cancel route
+src/client.js           browser half: the action, the row mark, the notices
+scripts/build.mjs       src/ -> lib/, then manifest/patch/locale/icon and syntax checks
+tests/manifest.test.mjs manifest, output freshness and agreement tests
+lib/index.js            built Host half (loaded by the Loader)
+lib/client.js           built browser half (loaded as a classic script)
+locale/{en,zh}.json     Plugin Manager title and description
+icon.svg                plugin icon
+.github/workflows/      CI: build + test on every push
+CHANGELOG.md            release notes
 ```
 
 ## License
